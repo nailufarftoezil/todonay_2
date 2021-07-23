@@ -16,8 +16,9 @@ function App() {
   const [name, setName] = useState("");
 
   const [total, setTotal] = useState(0)
+  
   //edit need this
-  const [currentTodo, setcurrentTodo] = useState(todos.currentTodo)
+  const [currentTodo, setcurrentTodo] = useState()
   const [editTodo, setEditTodo] = useState(false)
   
   
@@ -56,27 +57,7 @@ function App() {
      setTodos(todos => todos.filter(todo => todo.id !== id))
   };
 
-  const editTodoList = (todo, id) =>{
-    setEditTodo(true)
-    const ed = todos.filter((todo, id) => todo.id === id)
-    setcurrentTodo(ed)
-  }
-
-  const updateTodo = (id) =>{
-    setEditTodo(false)
-    const uedit = (prev, todo) => {
-      // nguarang pol sek  belom dicoba
-
-        return [...prev,{
-          id: todo.id,
-          todo: todo.todo,
-          status: todo.status
-        }]
-
-    }
-    setTodos(todos => todos.map(todo => todo.id !== id ? uedit : todo === todo.todo))
-    // setTodos(todos.map(todo => (todo.id === id ? uedit : todo===todo.todo )))
-  }
+  
 
  //UPDATE TERBARU BISA NAMBAHIN JUMLAH TODO YANG ACTIVE
 
@@ -107,8 +88,7 @@ function App() {
                 {/* <Button type="danger" >Clear All</Button> */}
             </Form.Item>
           </Form>
-        </>,
-    2:  <>
+
           <p>All Todo List</p><br />
           { editTodo ? (
             todos.map(
@@ -117,13 +97,13 @@ function App() {
               <Form className="form" >
                 <Form.Item label="Edit todo" key={todo.id}>
                     <Input type="text"  onChange={onChangeTodo} value={todo.todo}/>
-                    <Button type="primary" onClick={editTodoList(todo.id, todo)} >Edit Todo</Button>
+                    <Button type="primary" >Edit Todo</Button>
                     <Button type="danger" >Clear All</Button>
                 </Form.Item>
               </Form>
             </>
-            )) : (<>
-              
+            )) : (
+            <>
               {todos.map((todo, i) => (
                 <Form.Item key={todo.id}>
                   <Row>
@@ -137,19 +117,18 @@ function App() {
                     <Col span={12}>
                       <Space size={'large'}>
                         <Button onClick={()=>remove(todo.id)}><DeleteOutlined /></Button>
-                        <Button onClick={()=>editTodoList(todo.id)} ><EditOutlined /></Button>
+                        <Button ><EditOutlined /></Button>
                       </Space>
                     </Col>
-                </Row>
-              </Form.Item>
-              ))}
-              </>) 
-            
-           
+                  </Row>
+                </Form.Item>
+                ))
+              }
+              </>
+              )  
           }
-          
         </>,
-    3:  <>
+    2:  <>
           <p>All Done</p><br />
           {todos.filter(todo => todo.status === true).map((todo, i) => (
             
@@ -172,7 +151,7 @@ function App() {
           </Form.Item>
           ))}
         </>,
-    4: <>
+    3: <>
         <p>All Active</p><br />
         {todos.filter(todo => todo.status === false).map((todo, i) => (
           <Form.Item key={todo.id}>
@@ -213,9 +192,9 @@ function App() {
         <Header style={{ position: 'fixed', zIndex:1, color:'#fff', width: '100%'}} >
             <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[1]}>
               <Menu.Item key="1" onClick={handleMenuClickSider}>Add new Todo</Menu.Item>
-              <Menu.Item key="2" onClick={handleMenuClickSider}>All Todo</Menu.Item>
-              <Menu.Item key="3" onClick={handleMenuClickSider}>All Done</Menu.Item>
-              <Menu.Item key="4" onClick={handleMenuClickSider}>All Active Todo</Menu.Item>
+              <Menu.Item key="2" onClick={handleMenuClickSider}>All Done</Menu.Item>
+              <Menu.Item key="3" onClick={handleMenuClickSider}>All Active Todo</Menu.Item>
+              
             </Menu>   
            
         </Header>
