@@ -1,0 +1,217 @@
+import React, { useState } from "react";
+import UserTable from "./tables/UserTable";
+import AddUserForm from "./forms/AddUserForm";
+import EditUserForm from "./forms/EditUserForm";
+
+const App = () => {
+  const usersData = [
+    { id: 1, name: "AAA", username: "aiueo" },
+    { id: 2, name: "BBB", username: "kakikukeko" },
+    { id: 3, name: "CCC", username: "sasisuseso" }
+  ];
+
+  // usersの状態
+  const [users, setUsers] = useState(usersData);
+
+  // 更新関数を持つ追加メソッド
+  const addUser = user => {
+    user.id = users.length + 1;
+    setUsers([...users, user]);
+  };
+
+  // 更新関数を持つ削除メソッド
+  const deleteUser = id => {
+    setUsers(users.filter(user => user.id !== id));
+  };
+
+  // 編集状態か判断するための状態
+  const [editing, setEditing] = useState(false);
+  const initialFormState = { id: null, name: "", username: "" };
+  // 編集中の現在のユーザの状態（編集中ユーザーを知るため）
+  const [currentUser, setCurrentUser] = useState(initialFormState);
+
+  // 編集モードをONにスイッチして現在のユーザー情報をセットする関数
+  const editRow = user => {
+    setEditing(true);
+    setCurrentUser({ id: user.id, name: user.name, username: user.username });
+  };
+
+  // 編集後に更新投稿する関数
+  const updateUser = (id, updateUser) => {
+    setEditing(false);
+    setUsers(users.map(user => (user.id === id ? updateUser : user)));
+  };
+
+  return (
+    <div className="container">
+      <h1>CRUD App with Hooks</h1>
+      <div className="flex-row">
+        <div className="flex-large">
+          {editing ? (
+            <div>
+              <h2>Eidt User</h2>
+              <EditUserForm
+                editing={editing}
+                setEditing={setEditing}
+                currentUser={currentUser}
+                updateUser={updateUser}
+              />
+            </div>
+          ) : (
+            <div>
+              <h2>Add User</h2>
+              <AddUserForm addUser={addUser} />
+            </div>
+          )}
+        </div>
+        <div className="flex-large">
+          <h2>View users</h2>
+          <UserTable users={users} deleteUser={deleteUser} editRow={editRow} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
+
+import React from "react";
+
+const UserTable = props => (
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Username</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {props.users.length > 0 ? (
+        props.users.map(user => (
+          <tr key={user.id}>
+            <td>{user.name}</td>
+            <td>{user.username}</td>
+            <td>
+              <button
+                className="button muted-button"
+                onClick={() => props.editRow(user)}
+              >
+                Edit
+              </button>
+              <button
+                className="button muted-button"
+                onClick={() => props.deleteUser(user.id)}
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan={3}>No users</td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+);
+
+export default UserTable;
+
+
+import React, { useState, useEffect } from "react";
+
+const EditUserForm = props => {
+  const [user, setUser] = useState(props.currentUser);
+
+  useEffect(
+    () => {
+      setUser(props.currentUser);
+    },
+    [props]
+  );
+
+  const handleInputChange = event => {
+    const { name, value } = event.target;
+    setUser({ ...user, [name]: value });
+  };
+
+  return (
+    <form
+      onSubmit={event => {
+        event.preventDefault();
+        props.updateUser(user.id, user);
+      }}
+    >
+      <label>Name</label>
+      <input
+        type="text"
+        name="name"
+        value={user.name}
+        onChange={handleInputChange}
+      />
+      <label>Username</label>
+      <input
+        type="text"
+        name="username"
+        value={user.username}
+        onChange={handleInputChange}
+      />
+      <button>Update user</button>
+      <button
+        onClick={() => props.setEditing(false)}
+        className="button muted-button"
+      >
+        Cancel
+      </button>
+    </form>
+  );
+};
+
+export default EditUserForm;
+
+
+import React, { useState } from "react";
+
+const AddUserForm = props => {
+  const initialFormState = { id: null, name: "", username: "" };
+  const [user, setUser] = useState(initialFormState);
+
+  const handleInputChange = event => {
+    const { name, value } = event.target;
+    setUser({ ...user, [name]: value });
+  };
+
+  return (
+    <form
+      onSubmit={event => {
+        event.preventDefault();
+        if (!user.name || !user.username) return;
+        props.addUser(user);
+        setUser(initialFormState);
+      }}
+    >
+      <label>Name</label>
+      <input
+        type="text"
+        name="name"
+        value={user.name}
+        onChange={handleInputChange}
+      />
+      <label>Username</label>
+      <input
+        type="text"
+        name="username"
+        value={user.username}
+        onChange={handleInputChange}
+      />
+      <button>Add new user</button>
+    </form>
+  );
+};
+
+export default AddUserForm;
+
+
